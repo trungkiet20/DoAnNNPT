@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Quản Lý Nhà Trọ</title>
+    <link rel="stylesheet" href="css/style.css?v=2">
+    <link rel="stylesheet" href="css/chat.css?v=1">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Navigation -->
+        <nav class="glass-nav">
+            <div class="container nav-container">
+                <div class="logo"><i class="fas fa-house-chimney-window"></i><span>Nhà Trọ</span></div>
+                <ul id="nav-links">
+                    <!-- Dynamic links -->
+                </ul>
+                <div id="auth-status" class="auth-status-container">
+                    <!-- User info & Logout -->
+                </div>
+            </div>
+        </nav>
+
+        <main id="main-content">
+            <!-- Dynamic content -->
+        </main>
+
+        <footer class="site-footer">
+            <div class="container site-footer-inner">
+                <div>
+                    <h3>Nhà Trọ</h3>
+                    <p>Một giao diện quản lý gọn gàng, dễ nhìn và chỉ mở đúng phần cần dùng sau khi đăng nhập.</p>
+                </div>
+                <div class="site-footer-note">
+                    <p>Đăng nhập để bắt đầu làm việc trong không gian dành riêng cho bạn.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Modals / Toast -->
+    <div id="toast" class="toast"></div>
+
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="js/socket-client.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/admin.js"></script>
+    <script src="js/landlord.js"></script>
+    <script src="js/landlordFinance.js"></script>
+    <script src="js/tenant.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
