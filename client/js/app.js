@@ -221,7 +221,10 @@ function showToast(message, type = 'info') {
 }
 
 // Initial session check
-app.init();
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('App initializing...');
+    app.init();
+});
 
 // Global Socket Event Listeners for UI Refresh
 window.addEventListener('socket_new_message', (e) => {

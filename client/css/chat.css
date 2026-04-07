@@ -425,3 +425,68 @@
     border-radius: 50px;
     font-weight: 800;
 }
+
+/* ============================================================
+   RESIDENT PORTAL SPECIFIC CHAT
+   ============================================================ */
+.resident-chat-container {
+    background: #ffffff;
+    border-radius: 24px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn 0.4s ease-out;
+}
+
+.resident-chat-header {
+    background: linear-gradient(to right, #f8fafc, #ffffff);
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #edf2f7;
+}
+
+.resident-chat-header h3 {
+    margin: 0;
+    font-size: 1.15rem;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.resident-chat-header p {
+    margin: 0.3rem 0 0;
+    color: #64748b;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.resident-portal-chat {
+    height: 500px;
+    border: none;
+    border-radius: 0;
+    background: #fbfcfe;
+}
+
+.resident-chat-container .chat-input-row {
+    padding: 1.1rem 1.5rem 1.4rem;
+    background: #ffffff;
+    border-top: 1px solid #edf2f7;
+}
+
+.resident-portal-chat .chat-empty {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    gap: 0.75rem;
+}
+
+.resident-portal-chat .chat-empty i {
+    font-size: 2.5rem;
+    opacity: 0.4;
+}
+

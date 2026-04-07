@@ -219,6 +219,9 @@ const tenant = {
                         <button type="button" class="resident-inline-action" onclick="tenant.showResidentTab('issues')">
                             <i class="fas fa-screwdriver-wrench"></i> Báo cáo sự cố
                         </button>
+                        <button type="button" class="resident-inline-action" style="margin-top:0.5rem; background: var(--primary-light); color: var(--primary); border-color: var(--primary-light)" onclick="tenant.showResidentTab('chat')">
+                            <i class="fas fa-comments"></i> Nhắn tin cho chủ trọ
+                        </button>
                     </div>
                 </div>
 
@@ -795,6 +798,9 @@ const tenant = {
                             <button class="resident-tab ${this.residentTab === 'issues' ? 'active' : ''}" onclick="tenant.showResidentTab('issues')">
                                 <i class="fas fa-screwdriver-wrench"></i> Báo cáo sự cố
                             </button>
+                            <button class="resident-tab ${this.residentTab === 'chat' ? 'active' : ''}" onclick="tenant.showResidentTab('chat')">
+                                <i class="fas fa-comments"></i> Tin nhắn
+                            </button>
                         </div>
 
                         <div class="resident-content-shell">
@@ -802,11 +808,41 @@ const tenant = {
                                 ? this.renderResidentStay()
                                 : this.residentTab === 'notifications'
                                     ? this.renderResidentNotifications()
-                                    : this.renderIssueReports()}
+                                    : this.residentTab === 'issues'
+                                        ? this.renderIssueReports()
+                                        : this.renderResidentChat()}
                         </div>
                     </div>
                 </div>
             </section>
+        `;
+    },
+    
+    renderResidentChat() {
+        if (!this.currentStay) return `<div class="empty-state">Bạn chưa có phòng để nhắn tin</div>`;
+        const roomId = this.currentStay.roomId;
+        const landlordName = this.currentStay.landlord ? this.currentStay.landlord.username : 'Chủ trọ';
+        
+        // Use a timeout to load the conversation after the container is rendered
+        setTimeout(() => this.loadConversation(roomId), 100);
+
+        return `
+            <div class="resident-chat-container">
+                <div class="resident-chat-header">
+                    <h3><i class="fas fa-comments"></i> Nhắn tin với ${this.escapeHtml(landlordName)}</h3>
+                    <p>${this.escapeHtml(this.currentStay.room ? this.currentStay.room.title : 'Phòng của bạn')}</p>
+                </div>
+                <div id="chat-box-${roomId}" class="chat-box resident-portal-chat">
+                    <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Đang tải tin nhắn...</div>
+                </div>
+                <div class="chat-input-row">
+                    <textarea id="msg-input-${roomId}" class="chat-input" rows="2" 
+                        placeholder="Nhập tin nhắn cho chủ trọ..."></textarea>
+                    <button class="btn btn-primary chat-send-btn" onclick="tenant.sendMessage(${roomId})">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
         `;
     },
 
