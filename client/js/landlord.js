@@ -12,6 +12,7 @@ const landlord = {
         rooms: [],
         tenants: []
     },
+    activeChat: null,
 
     async init() {
         await this.loadCategories();
@@ -719,6 +720,7 @@ const landlord = {
 
     // ==================== TIN NHẮN ====================
     async showMessages() {
+        this.activeChat = null;
         this.setActiveLink('link-messages');
         const panel = document.getElementById('landlord-panel');
         panel.innerHTML = `<div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Đang tải...</div>`;
@@ -760,6 +762,7 @@ const landlord = {
     },
 
     async showConversation(roomId, tenantId, tenantName, roomTitle) {
+        this.activeChat = { roomId, tenantId, tenantName, roomTitle };
         const panel = document.getElementById('landlord-panel');
         panel.innerHTML = `<div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Đang tải...</div>`;
         try {
