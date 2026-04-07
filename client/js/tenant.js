@@ -897,12 +897,11 @@ const tenant = {
     },
 
     showTab(tab) {
-        ['rooms', 'inbox', 'invitations'].forEach(t => {
+        ['rooms', 'inbox'].forEach(t => {
             document.getElementById(`tab-content-${t}`).style.display = t === tab ? 'block' : 'none';
             document.getElementById(`tab-${t}`).classList.toggle('active', t === tab);
         });
         if (tab === 'inbox') this.loadInbox();
-        if (tab === 'invitations') this.loadInvitations();
     },
 
     renderRooms() {
@@ -1145,111 +1144,7 @@ const tenant = {
         }
     },
 
-    async checkPendingInvitations() {
-        try {
-            const res = await fetch(`${API_URL}/messages/invitation/tenant`, {
-                headers: { 'Authorization': `Bearer ${auth.getToken()}` }
-            });
-            const data = await res.json();
-            const pending = (data.data || []).filter(i => i.status === 'pending');
-            const badge = document.getElementById('invite-badge');
-            if (badge && pending.length > 0) {
-                badge.style.display = 'inline';
-                badge.textContent = pending.length;
-            }
-        } catch (e) {}
-    },
 
-    async loadInvitations() {
-        const panel = document.getElementById('tab-content-invitations');
-        panel.innerHTML = `<div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Đang tải...</div>`;
-        try {
-            const res = await fetch(`${API_URL}/messages/invitation/tenant`, {
-                headers: { 'Authorization': `Bearer ${auth.getToken()}` }
-            });
-            const data = await res.json();
-            const invs = data.data || [];
-            if (invs.length === 0) {
-                panel.innerHTML = `<div class="empty-state"><i class="fas fa-calendar-check fa-3x"></i><h3>Chưa có lời mời nào</h3><p>Khi chủ trọ gửi xác nhận lịch xem phòng, sẽ hiển thị ở đây</p></div>`;
-                return;
-            }
-            panel.innerHTML = `
-                <h3 style="margin:1.5rem 0 1rem"><i class="fas fa-calendar-check"></i> Lời Mời Xem Phòng</h3>
-                <div class="invitation-list">
-                    ${invs.map(inv => this.renderInvitationCard(inv)).join('')}
-                </div>
-            `;
-        } catch (err) {
-            panel.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><h3>Lỗi tải dữ liệu</h3></div>`;
-        }
-    },
-
-    renderInvitationCard(inv) {
-        const statusMap = {
-            pending: { text: 'Chờ xác nhận', cls: 'status-pending', icon: 'fa-clock' },
-            confirmed: { text: 'Đã xác nhận', cls: 'status-confirmed', icon: 'fa-check-circle' },
-            rejected: { text: 'Đã từ chối', cls: 'status-rejected', icon: 'fa-times-circle' }
-        };
-        const s = statusMap[inv.status] || statusMap.pending;
-        const dateStr = new Date(inv.viewingDate).toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        return `
-            <div class="invitation-card ${s.cls}">
-                <div class="inv-header">
-                    <div class="inv-icon"><i class="fas fa-calendar-alt"></i></div>
-                    <div class="inv-title">
-                        <h4>${inv.room ? inv.room.title : 'Phòng #' + inv.roomId}</h4>
-                        <p>${inv.room ? inv.room.address : ''}</p>
-                    </div>
-                    <span class="inv-status ${s.cls}"><i class="fas ${s.icon}"></i> ${s.text}</span>
-                </div>
-                <div class="inv-body">
-                    <div class="inv-detail">
-                        <i class="fas fa-user"></i>
-                        <span>Chủ trọ: <strong>${inv.landlord ? inv.landlord.username : '—'}</strong></span>
-                    </div>
-                    <div class="inv-detail">
-                        <i class="fas fa-calendar"></i>
-                        <span>Ngày xem: <strong>${dateStr}</strong></span>
-                    </div>
-                    <div class="inv-detail">
-                        <i class="fas fa-clock"></i>
-                        <span>Giờ xem: <strong>${inv.viewingTime}</strong></span>
-                    </div>
-                    ${inv.note ? `<div class="inv-note"><i class="fas fa-sticky-note"></i> ${inv.note}</div>` : ''}
-                </div>
-                ${inv.status === 'pending' ? `
-                <div class="inv-actions">
-                    <button class="btn btn-primary" onclick="tenant.respondInvitation(${inv.id}, 'confirmed')">
-                        <i class="fas fa-check"></i> Xác Nhận Tham Dự
-                    </button>
-                    <button class="btn" style="background:#fee2e2;color:#dc2626;border:none" onclick="tenant.respondInvitation(${inv.id}, 'rejected')">
-                        <i class="fas fa-times"></i> Từ Chối
-                    </button>
-                </div>` : ''}
-            </div>
-        `;
-    },
-
-    async respondInvitation(id, status) {
-        const action = status === 'confirmed' ? 'xác nhận tham dự' : 'từ chối';
-        if (!confirm(`Bạn có chắc muốn ${action} lời mời này?`)) return;
-        try {
-            const res = await fetch(`${API_URL}/messages/invitation/${id}/respond`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${auth.getToken()}`
-                },
-                body: JSON.stringify({ status })
-            });
-            if (res.ok) {
-                showToast(status === 'confirmed' ? 'Đã xác nhận! Hẹn gặp bạn.' : 'Đã từ chối lời mời.', status === 'confirmed' ? 'success' : 'info');
-                this.loadInvitations();
-            }
-        } catch (err) {
-            showToast('Lỗi kết nối', 'error');
-        }
-    },
 
     switchImg(url, el) {
         document.getElementById('gallery-main').style.backgroundImage = `url('${url}')`;

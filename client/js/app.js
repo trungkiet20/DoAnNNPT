@@ -239,7 +239,6 @@ window.addEventListener('socket_new_message', (e) => {
             tenant.loadConversation(roomId);
         }
         tenant.loadInbox();
-        tenant.checkPendingInvitations();
     } else if (user.role === 'Landlord' && typeof landlord !== 'undefined') {
         if (landlord.activeChat) {
             // Re-render current active conversation
@@ -251,18 +250,4 @@ window.addEventListener('socket_new_message', (e) => {
     }
 });
 
-window.addEventListener('socket_new_invitation', (e) => {
-    const user = auth.getUser();
-    if (user && user.role === 'Tenant' && typeof tenant !== 'undefined') {
-        tenant.loadInvitations?.();
-        tenant.checkPendingInvitations();
-    }
-});
 
-window.addEventListener('socket_invitation_update', (e) => {
-    const user = auth.getUser();
-    if (user && user.role === 'Landlord' && typeof landlord !== 'undefined') {
-        landlord.showSentInvitations?.();
-        landlord.checkUnreadMessages();
-    }
-});

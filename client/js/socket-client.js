@@ -26,27 +26,6 @@ const socketClient = {
             }
         });
 
-        // Listen for new invitations (Tenant side)
-        this.socket.on('receive_invitation', (data) => {
-            console.log('New invitation received:', data);
-            window.dispatchEvent(new CustomEvent('socket_new_invitation', { detail: data }));
-            
-            if (typeof showToast === 'function') {
-                showToast('Bạn có lời mời xem phòng mới!', 'success');
-            }
-        });
-
-        // Listen for invitation status updates (Landlord side)
-        this.socket.on('invitation_status_updated', (data) => {
-            console.log('Invitation status updated:', data);
-            window.dispatchEvent(new CustomEvent('socket_invitation_update', { detail: data }));
-            
-            if (typeof showToast === 'function') {
-                const statusText = data.status === 'confirmed' ? 'đã xác nhận' : 'đã từ chối';
-                showToast(`Khách thuê ${statusText} lời mời xem phòng.`, 'info');
-            }
-        });
-
         this.socket.on('disconnect', () => {
             console.log('Disconnected from server');
         });

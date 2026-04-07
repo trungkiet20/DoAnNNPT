@@ -230,27 +230,6 @@
     margin-top: 0.2rem;
 }
 
-/* Invitation Cards & List */
-.invitation-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 1.5rem;
-    margin-top: 1rem;
-}
-
-.invitation-card {
-    background: white;
-    border-radius: 20px;
-    padding: 1.5rem;
-    border: 1px solid #e2e8f0;
-    box-shadow: var(--shadow);
-    transition: transform 0.3s ease;
-}
-
-.invitation-card:hover {
-    transform: translateY(-5px);
-}
-
 .inv-header {
     display: flex;
     gap: 1rem;

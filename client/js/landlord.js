@@ -59,9 +59,7 @@ const landlord = {
                             <i class="fas fa-comments"></i> Tin Nhắn Khách
                             <span class="notif-badge" id="msg-badge" style="display:none">0</span>
                         </button>
-                        <button type="button" class="landlord-nav-link" id="link-invitations" onclick="landlord.showSentInvitations()">
-                            <i class="fas fa-calendar-check"></i> Lời Mời Đã Gửi
-                        </button>
+
                         <button type="button" class="landlord-nav-link" id="link-issues" onclick="landlord.showIssues()">
                             <i class="fas fa-screwdriver-wrench"></i> Báo Cáo Sự Cố
                             <span class="notif-badge" id="issue-badge" style="display:none">0</span>
@@ -779,11 +777,8 @@ const landlord = {
                         </button>
                         <h2><i class="fas fa-comments"></i> ${tenantName} — ${roomTitle}</h2>
                     </div>
-                    <button class="btn btn-primary" onclick="landlord.showInviteForm(${roomId}, ${tenantId}, '${tenantName}', '${roomTitle}')">
-                        <i class="fas fa-calendar-plus"></i> Gửi Lời Mời Xem Phòng
-                    </button>
+
                 </div>
-                <div id="invite-form-area"></div>
                 <div class="chat-panel">
                     <div class="chat-box" id="chat-box-landlord">
                         ${msgs.length === 0
@@ -859,140 +854,7 @@ const landlord = {
         }
     },
 
-    showInviteForm(roomId, tenantId, tenantName, roomTitle) {
-        const area = document.getElementById('invite-form-area');
-        if (!area) return;
-        // Ngày tối thiểu là ngày mai
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        const minDate = tomorrow.toISOString().split('T')[0];
 
-        area.innerHTML = `
-            <div class="invite-form-card">
-                <div class="invite-form-header">
-                    <i class="fas fa-calendar-plus"></i>
-                    <div>
-                        <h3>Gửi Lời Mời Xem Phòng</h3>
-                        <p>Gửi đến: <strong>${tenantName}</strong> — ${roomTitle}</p>
-                    </div>
-                    <button onclick="document.getElementById('invite-form-area').innerHTML=''" class="close-btn">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="invite-form-body">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label><i class="fas fa-calendar"></i> Ngày xem phòng *</label>
-                            <input type="date" id="inv-date" min="${minDate}" required>
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-clock"></i> Giờ xem phòng *</label>
-                            <input type="time" id="inv-time" required>
-                        </div>
-                    </div>
-                    <div class="form-group full-width" style="margin-bottom:0">
-                        <label><i class="fas fa-sticky-note"></i> Ghi chú thêm (tùy chọn)</label>
-                        <textarea id="inv-note" rows="2" placeholder="VD: Vui lòng mang CMND/CCCD để xem phòng. Liên hệ 0912345678 khi đến."></textarea>
-                    </div>
-                    <div class="form-actions" style="margin-top:1rem">
-                        <button class="btn btn-primary" onclick="landlord.submitInvitation(${roomId}, ${tenantId})">
-                            <i class="fas fa-paper-plane"></i> Gửi Lời Mời
-                        </button>
-                        <button class="btn btn-secondary" onclick="document.getElementById('invite-form-area').innerHTML=''">
-                            Hủy
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
-    },
-
-    async submitInvitation(roomId, tenantId) {
-        const viewingDate = document.getElementById('inv-date').value;
-        const viewingTime = document.getElementById('inv-time').value;
-        const note = document.getElementById('inv-note').value;
-        if (!viewingDate || !viewingTime) {
-            showToast('Vui lòng chọn ngày và giờ xem phòng', 'error');
-            return;
-        }
-        try {
-            const res = await fetch(`${API_URL}/messages/invitation`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${auth.getToken()}`
-                },
-                body: JSON.stringify({ roomId, tenantId, viewingDate, viewingTime, note })
-            });
-            const data = await res.json();
-            if (res.ok) {
-                showToast('Đã gửi lời mời xem phòng thành công!', 'success');
-                document.getElementById('invite-form-area').innerHTML = `
-                    <div class="invite-success">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Lời mời đã gửi! Khách sẽ nhận được thông báo và xác nhận tham dự.</span>
-                    </div>
-                `;
-            } else {
-                showToast(data.message || 'Lỗi gửi lời mời', 'error');
-            }
-        } catch (err) {
-            showToast('Lỗi kết nối server', 'error');
-        }
-    },
-
-    // ==================== LỜI MỜI ĐÃ GỬI ====================
-    async showSentInvitations() {
-        this.setActiveLink('link-invitations');
-        const panel = document.getElementById('landlord-panel');
-        panel.innerHTML = `<div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Đang tải...</div>`;
-        try {
-            const res = await fetch(`${API_URL}/messages/invitation/landlord`, {
-                headers: { 'Authorization': `Bearer ${auth.getToken()}` }
-            });
-            const data = await res.json();
-            const invs = data.data || [];
-            const statusMap = {
-                pending: { text: 'Chờ phản hồi', cls: 'status-pending', icon: 'fa-clock' },
-                confirmed: { text: 'Đã xác nhận', cls: 'status-confirmed', icon: 'fa-check-circle' },
-                rejected: { text: 'Đã từ chối', cls: 'status-rejected', icon: 'fa-times-circle' }
-            };
-            panel.innerHTML = `
-                <div class="panel-header">
-                    <h2><i class="fas fa-calendar-check"></i> Lời Mời Đã Gửi (${invs.length})</h2>
-                </div>
-                ${invs.length === 0
-                    ? `<div class="empty-state"><i class="fas fa-calendar fa-3x"></i><h3>Chưa có lời mời nào</h3><p>Hãy vào Tin Nhắn, xem tin nhắn của khách và gửi lời mời xem phòng.</p></div>`
-                    : `<div class="invitation-list">
-                        ${invs.map(inv => {
-                            const s = statusMap[inv.status] || statusMap.pending;
-                            const dateStr = new Date(inv.viewingDate).toLocaleDateString('vi-VN', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
-                            return `
-                                <div class="invitation-card ${s.cls}">
-                                    <div class="inv-header">
-                                        <div class="inv-icon"><i class="fas fa-calendar-alt"></i></div>
-                                        <div class="inv-title">
-                                            <h4>${inv.room ? inv.room.title : 'Phòng #'+inv.roomId}</h4>
-                                            <p>${inv.room ? inv.room.address : ''}</p>
-                                        </div>
-                                        <span class="inv-status ${s.cls}"><i class="fas ${s.icon}"></i> ${s.text}</span>
-                                    </div>
-                                    <div class="inv-body">
-                                        <div class="inv-detail"><i class="fas fa-user"></i><span>Khách: <strong>${inv.tenant ? inv.tenant.username : '—'}</strong></span></div>
-                                        <div class="inv-detail"><i class="fas fa-calendar"></i><span>Ngày: <strong>${dateStr}</strong></span></div>
-                                        <div class="inv-detail"><i class="fas fa-clock"></i><span>Giờ: <strong>${inv.viewingTime}</strong></span></div>
-                                        ${inv.note ? `<div class="inv-note"><i class="fas fa-sticky-note"></i> ${inv.note}</div>` : ''}
-                                    </div>
-                                </div>
-                            `;
-                        }).join('')}
-                    </div>`
-                }
-            `;
-        } catch (err) {
-            panel.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><h3>Lỗi tải dữ liệu</h3></div>`;
-        }
-    },
 
     // ==================== BÁO CÁO SỰ CỐ ====================
     async showIssues() {
